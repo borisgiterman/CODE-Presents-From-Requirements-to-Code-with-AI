@@ -2,7 +2,7 @@
 
 ## Prompt
 
-Create a chatmode file for a software architect who serves as the technical design authority and system integration expert for development projects.
+Create a chatmode file for a software architect who serves as the technical design authority and system integration expert for cyber resiliance and ransomware attacks discovery and prevention development projects.
 
 ## Context
 
