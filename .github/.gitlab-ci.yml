@@ -1,0 +1,288 @@
+include:
+- project: devops/job-templates
+  ref: v3.0.0
+  file: python-jobs.yml
+- project: devops/job-templates
+  ref: v3.0.0
+  file: change-jobs.yml
+- project: devops/job-templates
+  ref: v3.0.0
+  file: cicd-stages.yml
+- project: devops/job-templates
+  ref: v3.0.0
+  file: test-jobs.yml
+- project: devops/job-templates
+  ref: v3.0.0
+  file: security-jobs.yml
+- project: devops/job-templates
+  ref: v3.0.0
+  file: deploy-jobs.yml
+- project: devops/cicd-constructs
+  ref: v3.0.0
+  file: cicd-constructs.yml
+
+
+variables:
+  REQ_FILE: src/requirements.txt
+  PY_FILE: src/knn_iris.py
+  TARGET: src/
+
+
+compile-package:
+  extends: .compile-package-python
+  variables:
+    REQ_FILE: src/requirements.txt
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature).*$/
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+  stage: build
+
+
+unit-test:
+  extends: .unit-test-python
+  variables:
+    UNIT_TEST_FILE: unit-test/serverTest.py
+    REQ_FILE: src/requirements.txt
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature).*$/
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+  stage: verify-build
+  allow_failure: false
+
+
+code-quality:
+  extends: .code-quality
+  variables:
+    SONAR_PROJECT_NAME: python-blueprint-v1.0
+    COVERAGE_FILE: $CI_PROJECT_DIR/coverage.xml
+    UNIT_TEST_FILE: unit-test/serverTest.py
+    REQ_FILE: src/requirements.txt
+    SONAR_LANG: python
+    SONAR_IMAGE_TAG: $SONAR_IMAGE
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature).*$/
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+  stage: verify-build
+  allow_failure: false
+
+inclusive-lang:
+  extends: .inclusive_language
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature|[rR]elease).*$/
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+
+xray-scan:
+  extends: .xray-scan
+  retry: 2
+  variables:
+    TARGET: src/*
+    UPLOAD_PATH: cicd-1003184-generic-dev-local
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature).*$/
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+  stage: verify-build
+  allow_failure: false
+
+
+build-docker:
+  extends: .build-docker
+  variables:
+    APP_VERSION: v1
+    DOCKERFILE: Dockerfile
+    VAULT_HARBOR_SECRET_PATH: kv/HARBOR
+    HARBOR_NAMESPACE: non-prod-devops
+    MYAPP_IMAGE: $NGINX_IMG
+    ACR_SERVER: acecicdenableacr.azurecr.io
+    APP_NAME: $CI_PROJECT_NAME
+    APP_TAG: $CI_COMMIT_SHORT_SHA
+    AKS_SECRET_PATH: kv/APPSERVICES
+  stage: build-docker
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature|[rR]elease).*$/
+    allow_failure: false
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+    allow_failure: false
+
+
+container-scan:
+  extends: .container-scan-aks
+  variables:
+    ACR_SERVER: acecicdenableacr.azurecr.io
+    VAULT_SECRET_PATH: kv/TWISTLOCK
+    APP_VERSION: v1
+    CRITICAL_VULNERABILITY_THRESHOLD: '1'
+    HIGH_VULNERABILITY_THRESHOLD: '5'
+  stage: verify-docker
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature|[rR]elease).*$/
+    allow_failure: false
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+    allow_failure: false
+
+
+
+aks-deploy:
+  extends: .deploy-k8s
+  stage: deploy
+  variables:
+    DEPLOYMENT_FILE: aks-config/deployment.nonprod.yml
+    SERVICE_FILE: aks-config/service.nonprod.yml
+    DEPLOYMENT_NAME: python-aks-blueprint-cloudnative-deployment
+    SERVICE_NAME: python-aks-blueprint-cloudnative-service
+    VAULT_SECRET_PATH: kv/APPSERVICES
+    AKS_CLUSTER_NAME: scus-ace-cicd-aks
+    AKS_NAMESPACE: test
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature|[rR]elease).*$/
+    allow_failure: false
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+    allow_failure: false
+
+
+hcl-appscan:
+  extends: .dast
+  variables:
+    DAST_FOLDER_ITEM_ID: '6282'
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature).*$/
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+    allow_failure: false
+  stage: validate-deploy
+  allow_failure: false
+
+
+performance-test:
+  extends: .jmeter-performance-test
+  environment:
+    deployment_tier: testing
+    name: perf1
+  variables:
+    APP_NAME: $APP_NAME_PERF
+    VAULT_PCF_SPACE: kv/PCF/PERF
+    PERF_TEST_URL: $APP_NAME_PERF.$DOMAIN_NP
+    JMX_FILE: Jmeter/python-blueprint.jmx
+    SLA: '10000'
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([fF]eature).*$/
+  - if: $CI_COMMIT_BRANCH =~ /^([Mm]aster|[Mm]ain).*$/
+  stage: validate-deploy
+  allow_failure: false
+
+
+integration-test-python:
+  stage: validate-deploy
+  variables:
+    CFLAGS: -Qunused-arguments
+    CPPFLAGS: -Qunused-arguments
+    REQ_FILE: src/requirements.txt
+    INT_TEST_FILE: unit-test/serverTest.py
+  script:
+  - echo -e \\\"\\\\x1b[36;1mRunning \\\\x1b[35;1m[$CI_JOB_STAGE]\\\\x1b[36;1m stage with
+    $CI_JOB_IMAGE ...\\\\e[0m\\\"
+  - echo \\\"REQUIRED VARIABLES ==> CFLAGS=$CFLAGS | CPPFLAGS=$CPPFLAGS | REQ_FILE=$REQ_FILE
+    | INT_TEST_FILE=$INT_TEST_FILE\\\"
+  - export CFLAGS=$CFLAGS
+  - export CPPFLAGS=$CPPFLAGS
+  - pip3 install -r $REQ_FILE
+  - python3 $INT_TEST_FILE
+  tags:
+  - linux
+  rules:
+  - if: $CI_COMMIT_BRANCH =~ /^([rR]elease).*$/
+
+
+validate-deployment-env-aks:
+  extends: .validate-deployment-env-aks
+  variables:
+    DEPLOY_JOBS: aks-deploy-prod
+  rules:
+  - if: $CI_COMMIT_TAG || $CI_PIPELINE_SOURCE == "pipeline"
+  stage: prerfc-validate
+
+
+create-rfc:
+  extends: .create-rfc-standard
+  environment:
+    name: rfc
+  before_script:
+  - start_date=$(date '+%Y-%m-%d %H:%M:00'); end_date=$(date -d '+2 hour' '+%Y-%m-%d
+    %H:%M:00'); jq '.u_planned_end_date = \\\"'\\\"$end_date\\\"'\\\"' standard-change.json|sponge
+    standard-change.json; jq '.u_planned_start_date = \\\"'\\\"$start_date\\\"'\\\"' standard-change.json|sponge
+    standard-change.json; cat standard-change.json
+
+  rules:
+  - if: $CI_COMMIT_TAG
+  stage: rfc-submit
+
+
+
+
+aks-deploy-prod:
+  extends: .deploy-k8s-prod
+  variables:
+    ACR_SERVER: acecicdenableacr.azurecr.io
+    DEPLOYMENT_FILE: aks-config/deployment.nonprod.yml
+    SERVICE_FILE: aks-config/service.nonprod.yml
+    DEPLOYMENT_NAME: python-aks-blueprint-cloudnative-deployment
+    SERVICE_NAME: python-aks-blueprint-cloudnative-service
+    VAULT_SECRET_PATH: kv/APPSERVICES
+    AKS_CLUSTER_NAME: scus-ace-cicd-aks
+    AKS_NAMESPACE: test
+  environment:
+    name: prod
+  rules:
+  - if: $CI_COMMIT_TAG
+    allow_failure: false
+  stage: deploy-prod
+
+
+
+regression-test-PROD:
+  extends: .test-api-trigger-tests-prod
+  variables:
+    RELEASE: Any
+    TESTENVIRONMENT: CORP
+    TESTTYPE: Regression
+    TESTAPI_PROJECT_NAME: Gitlab CICD Blueprints
+  rules:
+  - if: $CI_COMMIT_TAG
+  stage: validate-prod
+
+
+update-rfc-deploy:
+  extends: .update-rfc-deploy
+  image: $RFC_IMAGE
+  environment:
+    name: rfc
+  rules:
+  - if: $CI_COMMIT_TAG
+  stage: rfc-update
+
+
+feature-toggle-test:
+  stage: validate-live
+  script:
+  - echo \\\"feature toggle test\\\"
+  tags:
+  - linux
+  rules:
+  - if: $CI_COMMIT_TAG
+
+
+update-rfc-validate:
+  extends: .update-rfc-validate
+  image: $RFC_IMAGE
+  environment:
+    name: rfc
+  rules:
+  - if: $CI_COMMIT_TAG
+  stage: rfc-close
+
+
+k8s-files-scan:
+  extends: .k8s-files-scan
+  variables:
+    METADATA_FILENAME: deploy-jobs.yml
+  rules:
+  - if: $CI_COMMIT_TAG
+

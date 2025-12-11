@@ -5,6 +5,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Projects\\AI_Projects\\AgenticAI\\Requirements-to-Code-WithAI\\.github\\cr-requirements\\orm\\cyber_resilience_domain.orm||{EDA9E282-8FC6-4AE4-AF2C-C224FD3AE49B}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:.github\\cr-requirements\\orm\\cyber_resilience_domain.orm||{EDA9E282-8FC6-4AE4-AF2C-C224FD3AE49B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Projects\\AI_Projects\\AgenticAI\\Requirements-to-Code-WithAI\\.github\\cr-requirements\\orm\\cyber_resilience_domain.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:.github\\cr-requirements\\orm\\cyber_resilience_domain.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,11 +18,23 @@
       "DocumentGroups": [
         {
           "DockedHeight": 282,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "cyber_resilience_domain.txt",
+              "DocumentMoniker": "C:\\Projects\\AI_Projects\\AgenticAI\\Requirements-to-Code-WithAI\\.github\\cr-requirements\\orm\\cyber_resilience_domain.txt",
+              "RelativeDocumentMoniker": ".github\\cr-requirements\\orm\\cyber_resilience_domain.txt",
+              "ToolTip": "C:\\Projects\\AI_Projects\\AgenticAI\\Requirements-to-Code-WithAI\\.github\\cr-requirements\\orm\\cyber_resilience_domain.txt",
+              "RelativeToolTip": ".github\\cr-requirements\\orm\\cyber_resilience_domain.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2025-12-11T17:54:25.56Z"
             },
             {
               "$type": "Document",
@@ -29,7 +45,7 @@
               "ToolTip": "C:\\Projects\\AI_Projects\\AgenticAI\\Requirements-to-Code-WithAI\\.github\\cr-requirements\\orm\\cyber_resilience_domain.orm",
               "RelativeToolTip": ".github\\cr-requirements\\orm\\cyber_resilience_domain.orm",
               "Icon": "00000000-0000-0000-0000-000000000000.000000|",
-              "WhenOpened": "2025-12-02T16:52:18.512Z"
+              "WhenOpened": "2025-12-11T17:54:18.045Z"
             },
             {
               "$type": "Bookmark",

@@ -44,13 +44,16 @@ The following workflows from `.github/cr-requirements/use-cases/cr-workflows.md`
 
 ### Domain Model Context
 
-Use the Zeus Academia system's domain model from `.github/requirements/orm/` which includes:
+Use the Cyber Resilience system's domain model from `.github/requirements/orm/` which includes:
 
 **Core Entities:**
 
-- PPDM (PowerProtect Data Manager) - storage backup system
-- PowerStore - primary storage system, keeping organizational data
-- 
+- Academic (Faculty members) - identified by employee number
+- Ranks: Professor (P), Senior Lecturer (SL), Lecturer (L)
+- Employment Status: Tenured OR contracted until date (mutually exclusive)
+- Degrees & Universities: Educational qualifications tracking
+- Extensions: Phone extensions (unique per academic)
+- Access Levels: International (INT), National (NAT), Local (LOC)
 
 **Key Business Rules:**
 

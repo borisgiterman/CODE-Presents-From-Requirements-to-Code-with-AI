@@ -11,6 +11,6 @@
     "\\.github\\requirements\\orm",
     "\\.github\\requirements\\use-cases"
   ],
-  "SelectedNode": "\\.github\\requirements\\orm\\academia.orm",
+  "SelectedNode": "\\.github\\cr-requirements\\orm\\cyber_resilience_domain.orm",
   "PreviewInSolutionExplorer": false
 }
