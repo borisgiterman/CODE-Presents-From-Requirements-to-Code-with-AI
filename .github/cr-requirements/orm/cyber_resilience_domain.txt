@@ -1,0 +1,4 @@
+PPDM is an entity type.
+Reference Scheme: PPDM has systemId.
+Reference Mode: systemId.
+Data Type: Text: Fixed Length (9).

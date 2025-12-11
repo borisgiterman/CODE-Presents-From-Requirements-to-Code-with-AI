@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\.github",
+    "\\.github\\cr-requirements",
+    "\\.github\\cr-requirements\\orm",
+    "\\.github\\cr-requirements\\use-cases",
+    "\\.github\\instructions",
+    "\\.github\\prompts",
+    "\\.github\\requirements",
+    "\\.github\\requirements\\orm",
+    "\\.github\\requirements\\use-cases"
+  ],
+  "SelectedNode": "\\.github\\requirements\\orm\\academia.orm",
+  "PreviewInSolutionExplorer": false
+}
